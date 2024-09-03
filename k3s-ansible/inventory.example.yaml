@@ -1,0 +1,22 @@
+
+k3s_cluster:
+  children: 
+    server:
+      hosts:
+        dev-master-node:
+          ansible_connection: ssh
+          ansible_host:  xxx.xxx.xx.xx
+    agent:
+      hosts:
+        worker-node-1:
+          ansible_connection: ssh
+          ansible_host:  xxx.xxx.xx.xx
+        worker-node-2:
+          ansible_connection: ssh
+          ansible_host:  xxx.xxx.xx.xx
+  vars:
+    API_SERVER_ENDPOINT: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
+    API_SERVER_PORT: 6443
+    K3S_TOKEN: "k3s_token"
+    K3S_VERSION: v1.30.4+k3s1
+    EXTRA_AGENT_ARGS: ""

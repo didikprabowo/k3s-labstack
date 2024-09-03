@@ -1,0 +1,46 @@
+---
+
+# Tasks to check the K3S already Installed or not
+# If installed when set variable k3s_installed as true
+- name: Check if K3S is already installed
+  ansible.builtin.shell:
+    cmd: "test -f /usr/local/bin/k3s"
+  register: k3s_installed
+  failed_when: false
+
+- name : Download K3S Installation and Setup the Binary
+  when: k3s_installed.rc != 0
+  block:
+    # Dowload K3s Installation to machine 
+    - name: Download File K3S Installation
+      ansible.builtin.get_url:
+        url: https://get.k3s.io/
+        timeout: 120
+        dest: /usr/local/bin/k3s-install.sh
+        owner: root
+        group: root
+        mode: "0755"
+    - name: Download K3s binary
+      ansible.builtin.command:
+        cmd: /usr/local/bin/k3s-install.sh
+      environment:
+        INSTALL_K3S_SKIP_START: "true"
+        INSTALL_K3S_VERSION: "{{ K3S_VERSION }}"
+        INSTALL_K3S_EXEC: "agent"
+      changed_when: true
+
+- name: Copy K3s service file
+  register: k3s_agent_service
+  ansible.builtin.template:
+    src: "k3s-agent.service.j2"
+    dest: "{{ SYSTEMD_DIR }}/k3s-agent.service"
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+
+- name: Enable and check K3s service
+  ansible.builtin.systemd:
+    name: k3s-agent
+    daemon_reload: "{{ true if k3s_agent_service.changed else false }}"
+    state: "{{ 'restarted' if k3s_agent_service.changed else 'started' }}"
+    enabled: true

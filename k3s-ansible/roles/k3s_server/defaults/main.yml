@@ -1,0 +1,14 @@
+---
+# defaults file for k3s_server
+KUBECONFIG: ~/.kube/config.new
+SYSTEMD_DIR: "/etc/systemd/system"
+K3S_SERVER_LOCATION: "/var/lib/rancher/k3s"
+API_SERVER_PORT: 6443
+EXTRA_SERVER_ARGS: --disable traefik --tls-san '{{ hostvars[inventory_hostname].ansible_host }}'
+USER_KUBECTL: true
+
+
+
+
+# https://github.com/k3s-io/k3s-ansible/blob/master/roles/k3s_server/tasks/main.yml
+# https://dev.to/hatati/cook-up-a-k3s-cluster-on-raspberry-pies-with-ansible-4bb4

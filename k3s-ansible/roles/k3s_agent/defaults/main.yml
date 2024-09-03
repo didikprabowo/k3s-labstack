@@ -1,0 +1,5 @@
+---
+# defaults file for k3s_agent
+K3S_SERVER_LOCATION: "/var/lib/rancher/k3s" 
+SYSTEMD_DIR: "/etc/systemd/system"  
+API_PORT: 6443  
